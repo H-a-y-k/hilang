@@ -187,7 +187,7 @@ std::vector<Token> tokenize(const std::string &source)
         }
         Token token = extractToken(source, i);
 
-            std::cout << '<' << token.value << ", " << mmm[token_type(token)] << ">,";
+//            std::cout << '<' << token.value << ", " << mmm[token_type(token)] << ">,";
 
         i += token.value.size();
 

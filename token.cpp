@@ -25,6 +25,11 @@ bool is_string(const std::string &tok)
     return (tok.front() == '"' && tok.back() == '"');
 }
 
+bool is_literal(const std::string &tok)
+{
+    return is_number(tok) || is_bool(tok) || is_string(tok);
+}
+
 bool is_name(const std::string &tok)
 {
     for (char c : tok)

@@ -5,7 +5,7 @@
 
 bool is_operator(NonTerminal nt)
 {
-    return (std::find(_operator.begin(), _operator.end(), Word{nt}) != _operator.end());
+    return (std::find(_operator_seq.begin(), _operator_seq.end(), Word{nt}) != _operator_seq.end());
 }
 
 bool is_primitive(NonTerminal nt)
@@ -21,55 +21,120 @@ std::string expand(const std::vector<Token> toks)
     return result;
 }
 
-std::string match(const Word &word, const std::vector<Token> &tokens, int &current, const std::string &startstr, const Sequence &this_seq)
+std::string parse_identifier(const std::vector<Token> &tokens, int &current)
+{
+    if (is_name(tokens[current].value))
+    {
+        return tokens[current].value;
+    }
+    return "";
+}
+
+std::string parse_literal(const std::vector<Token> &tokens, int &current)
+{
+    if (is_literal(tokens[current].value))
+    {
+        return tokens[current].value;
+    }
+    return "";
+}
+
+std::string match(const Word &word, const std::vector<Token> &tokens, int &current, const std::string &startstr)
 {
     std::string expanded = startstr;
-    std::string token_expanded;
+    std::string token_expanded = expanded;
     std::string tokentext;
     int current_start = current;
 
+    if (current >= tokens.size())
+    {
+        return startstr;
+    }
     for (auto symbol = word.begin(); symbol != word.end(); symbol++)
     {
         if (is_primitive(*symbol))
         {
-            expanded += primitive[*symbol];
-            if (expanded == token_expanded+tokens[current].value)
+            if (expanded+primitive[*symbol] == token_expanded+tokens[current].value)
             {
-                token_expanded += tokens[current].value;
+                expanded += primitive[*symbol];
+                token_expanded += tokens.at(current).value;
                 current++;
             }
-            if (expanded.size() > (token_expanded + tokens[current].value).size())
-                return "";
+            else
+            {
+                current = current_start;
+                return startstr;
+            }
         }
-        if (*symbol == __this)
+        else if (*symbol == _identifier)
         {
-//            if (this_seq == Sequence{})
-//                return match(word, tokens, current, expanded);
-            return expanded + expand(match(this_seq, std::vector<Token>(tokens.begin(), tokens.begin() + current)));
+            auto id = parse_identifier(tokens, current);
+            if (id.size())
+            {
+                expanded += id;
+                token_expanded += id;
+                current++;
+            }
+            else
+            {
+                current = current_start;
+                return startstr;
+            }
+        }
+        else if (*symbol == _literal)
+        {
+            auto lit = parse_literal(tokens, current);
+            if (lit.size())
+            {
+                expanded += lit;
+                token_expanded += lit;
+                current++;
+            }
+            else
+            {
+                current = current_start;
+                return startstr;
+            }
+        }
+        else
+        {
+            auto expanded1 = match(rules[*symbol], std::vector<Token>(tokens.begin(), tokens.end()), current, expanded);
+            if (expanded != expanded1)
+            {
+                expanded = expanded1;
+                token_expanded = expanded;
+            }
+            else
+            {
+                current = current_start;
+                return startstr;
+            }
         }
     }
 
-    std::cout << expanded << ".." << token_expanded;
+    std::cout << "/" << expanded << ".." << token_expanded << "/\n";
     if (expanded != token_expanded)
     {
         current = current_start;
-        return "";
+        return startstr;
     }
     return expanded;
 }
 
-std::vector<Token> match(const Sequence &seq, const std::vector<Token> &tokens)
+std::string match(const Sequence &seq, const std::vector<Token> &tokens, int &current, const std::string &startstr)
 {
-    int current = 0;
     for (const auto &word : seq)
     {
-        if (!match(word, tokens, current, "", seq).empty())
-            return std::vector<Token>(tokens.begin(), tokens.begin() + current);
+        auto m = match(word, tokens, current, startstr);
+        if (m != startstr)
+        {
+            return m;
+        }
     }
-    return {};
+    return startstr;
 }
 
-//void parse(const std::vector<Token> &tokens)
-//{
-
-//}
+// void parse(const std::vector<Token> &tokens)
+// {
+    
+// }
