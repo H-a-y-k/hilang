@@ -96,7 +96,8 @@ inline Sequence _function_call_seq = {{_identifier, _open_paren, _arguments, _cl
 inline Sequence _lxh_seq = {{_literal}, {_function_call}, {_identifier}};
 inline Sequence _rxh_seq = {{_expression}, {_literal}, {_function_call}, {_identifier}};
 
-inline Sequence _expression_seq = {{_lxh, _infix_operator, _rxh}};
+inline Sequence _expression_seq = {{_lxh, _infix_operator, _rxh},  {_open_paren, _expression, _closed_paren, _infix_operator, _expression}, {_open_paren, _expression, _closed_paren},
+                                   {_open_paren, _lxh, _closed_paren}, {_lxh}};
 
 inline Sequence _instruction_seq = Sequence{{_expression}} + _punctuator_seq;
 
