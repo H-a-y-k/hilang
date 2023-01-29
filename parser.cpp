@@ -70,7 +70,7 @@ std::string parse_word(const Word &word, const std::vector<Token> &tokens, int &
     std::string expanded = initial_expansion;
     std::string parsed = expanded;
 
-    int current_start = current;
+    int initial_index = current;
 
     if (current >= tokens.size())
         return initial_expansion;
@@ -96,7 +96,7 @@ std::string parse_word(const Word &word, const std::vector<Token> &tokens, int &
 
         if (expanded == parsed)
         {
-            current = current_start;
+            current = initial_index;
             return initial_expansion;
         }
 
