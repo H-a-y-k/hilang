@@ -13,6 +13,6 @@ int main()
 //        std::cout << tok.value << ".." << token_type(tok) << "\n";
 //    }
     int i = 0;
-    cout << "Parsed: " << match(Word{_expression}, result, i);
+    cout << "Parsed: " << parse_word(Word{_expression}, result, i);
     return 0;
 }

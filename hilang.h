@@ -53,9 +53,9 @@ bool is_name(const std::string &tok);
 TokenType token_type(Token tok);
 std::vector<Token> tokenize(const std::string &source);
 
-std::string parse_identifier(const std::vector<Token>&, int&);
-std::string parse_literal(const std::vector<Token>&, int&);
-std::string match(const Word &word, const std::vector<Token>&, int&, const std::string& = "");
-std::string match(const Sequence &seq, const std::vector<Token> &tokens, int &current, const std::string & = "");
+//std::string parse_identifier(const std::vector<Token>&, int&);
+//std::string parse_literal(const std::vector<Token>&, int&);
+std::string parse_word(const Word &word, const std::vector<Token>&, int&, const std::string& = "");
+std::string parse_sequence(const Sequence &seq, const std::vector<Token> &tokens, int &current, const std::string & = "");
 
 #endif
