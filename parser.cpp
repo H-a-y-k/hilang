@@ -21,106 +21,109 @@ std::string expand(const std::vector<Token> toks)
     return result;
 }
 
-
-std::string parse_primitive(const std::string &value, const std::vector<Token> &tokens, int &current, const std::string &initial_expansion)
+std::string parse_primitive(const std::string &value, const std::vector<Token> &tokens, int &current)
 {
     if (current >= tokens.size())
-        return initial_expansion;
+        return "";
 
     if (value == tokens[current].value)
     {
-
-        std::string parsed = initial_expansion + value;
         current++;
-        return parsed;
+        return value;
     }
-    return initial_expansion;
+    return "";
 }
 
-std::string parse_identifier(const std::vector<Token> &tokens, int &current, const std::string &initial_expansion)
+std::string parse_identifier(const std::vector<Token> &tokens, int &current)
 {
     if (current >= tokens.size())
-        return initial_expansion;
+        return "";
 
     if (is_name(tokens[current].value))
     {
-        std::string parsed = initial_expansion + tokens[current].value;
+        std::string parsed = tokens[current].value;
         current++;
         return parsed;
     }
-    return initial_expansion;
+    return "";
 }
 
-std::string parse_literal(const std::vector<Token> &tokens, int &current, const std::string &initial_expansion)
+std::string parse_literal(const std::vector<Token> &tokens, int &current)
 {
     if (current >= tokens.size())
-        return initial_expansion;
+        return "";
 
     if (is_literal(tokens[current].value))
     {
-        std::string parsed = initial_expansion + tokens[current].value;
+        std::string parsed = tokens[current].value;
         current++;
         return parsed;
     }
-    return initial_expansion;
+    return "";
 }
 
-std::string parse_word(const Word &word, const std::vector<Token> &tokens, int &current, const std::string &initial_expansion)
+std::string parse_word(const Word &word, const std::vector<Token> &tokens, int &current)
 {
-    std::string expanded = initial_expansion;
-    std::string parsed = expanded;
+    std::string parsed;
+    std::string parsed_prev;
 
     int initial_index = current;
 
     if (current >= tokens.size())
-        return initial_expansion;
+        return "";
 
     for (auto symbol = word.begin(); symbol != word.end(); symbol++)
     {
         if (is_primitive(*symbol))
         {
-            parsed = parse_primitive(primitive[*symbol], tokens, current, expanded);
+            parsed += parse_primitive(primitive.at(*symbol), tokens, current);
         }
         else if (*symbol == _identifier)
         {
-            parsed = parse_identifier(tokens, current, expanded);
+            parsed += parse_identifier(tokens, current);
         }
         else if (*symbol == _literal)
         {
-            parsed = parse_literal(tokens, current, expanded);
+            parsed += parse_literal(tokens, current);
         }
         else
         {
-            parsed = parse_sequence(rules[*symbol], tokens, current, expanded);
+            parsed += parse_sequence(rules.at(*symbol), tokens, current);
         }
 
-        if (expanded == parsed)
+        if (parsed == parsed_prev)
         {
             current = initial_index;
-            return initial_expansion;
+            return "";
         }
 
-        expanded = parsed;
+        parsed_prev = parsed;
     }
 
 //    std::cout << expanded << "\n";
-    return expanded;
+    return parsed;
 }
 
-std::string parse_sequence(const Sequence &seq, const std::vector<Token> &tokens, int &current, const std::string &initial_expansion)
+std::string parse_sequence(const Sequence &seq, const std::vector<Token> &tokens, int &current)
 {
     for (const auto &word : seq)
     {
-        auto parsed = parse_word(word, tokens, current, initial_expansion);
-        if (parsed != initial_expansion)
+        auto parsed = parse_word(word, tokens, current);
+        if (!parsed.empty())
         {
             return parsed;
         }
     }
-    return initial_expansion;
+    return "";
 }
 
-// void parse(const std::vector<Token> &tokens)
-// {
-    
-// }
+ void parse(const std::vector<Token> &tokens)
+ {
+     std::string parsed;
+     int current = 0;
+     do
+     {
+         parsed = parse_word(Word{_instruction}, tokens, current);
+         std::cout << parsed << "\n";
+     } while (!parsed.empty());
+ }
